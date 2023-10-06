@@ -41,6 +41,13 @@ spec:
 {{ toYaml .Values.statefulsetAnnotations | indent 4}}
 {{- end }}
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      hostNetwork: false
+      hostPID: false
       containers:
       - name: dapr-placement-server
         livenessProbe:
@@ -159,6 +166,7 @@ spec:
         - "--mode=kubernetes"
 {{- if eq .Values.global.daprControlPlaneOs "linux" }}
         securityContext:
+<<<<<<< Updated upstream
 {{- if eq .Values.cluster.forceInMemoryLog true }}
           runAsNonRoot: {{ .Values.runAsNonRoot }}
 {{- else }}
@@ -176,6 +184,19 @@ spec:
           seccompProfile:
             type: {{ .Values.global.seccompProfile }}
   {{- end }}
+=======
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          privileged: false
+{{- if eq .Values.debug.enabled true }}
+          capabilities:
+            add:
+              - SYS_PTRACE
+{{- else }}
+          capabilities:
+            drop: ["ALL"]
+{{- end }}
+>>>>>>> Stashed changes
 {{- end }}
         env:
           - name: PLACEMENT_ID

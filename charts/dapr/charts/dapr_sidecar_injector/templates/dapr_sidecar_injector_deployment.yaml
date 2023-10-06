@@ -41,6 +41,14 @@ spec:
     spec:
       {{- if .Values.hostNetwork }}
       hostNetwork: true
+      {{- else }}
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      hostNetwork: false
+      hostPID: false
       {{- end }}
       serviceAccountName: dapr-injector
       containers:
@@ -77,11 +85,15 @@ spec:
         securityContext:
   {{- if eq .Values.runAsNonRoot true }}
           runAsNonRoot: {{ .Values.runAsNonRoot }}
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          privileged: false
   {{- else }}
           runAsUser: 1000
   {{- end }}
   {{- if eq .Values.debug.enabled true }}
           capabilities:
+<<<<<<< Updated upstream
             add: ["SYS_PTRACE"]
   {{- else }}
           readOnlyRootFilesystem: true
@@ -91,6 +103,13 @@ spec:
   {{- if .Values.global.seccompProfile }}
           seccompProfile:
             type: {{ .Values.global.seccompProfile }}
+=======
+            add:
+              - SYS_PTRACE
+  {{- else }}
+          capabilities:
+            drop: ["ALL"]
+>>>>>>> Stashed changes
   {{- end }}
 {{- end }}
         command:

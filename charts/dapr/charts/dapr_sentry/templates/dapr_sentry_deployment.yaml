@@ -69,6 +69,13 @@ spec:
 {{ toYaml .Values.deploymentAnnotations | indent 4}}
 {{- end }}
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+      hostNetwork: false
+      hostPID: false
       containers:
       - name: dapr-sentry
         livenessProbe:
@@ -102,8 +109,12 @@ spec:
 {{- if eq .Values.global.daprControlPlaneOs "linux" }}
         securityContext:
           runAsNonRoot: {{ .Values.runAsNonRoot }}
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          privileged: false
   {{- if eq .Values.debug.enabled true }}
           capabilities:
+<<<<<<< Updated upstream
             add: ["SYS_PTRACE"]
   {{- else }}
           readOnlyRootFilesystem: true
@@ -113,6 +124,13 @@ spec:
   {{- if .Values.global.seccompProfile }}
           seccompProfile:
             type: {{ .Values.global.seccompProfile }}
+=======
+            add:
+              - SYS_PTRACE
+  {{- else }}
+          capabilities:
+            drop: ["ALL"]
+>>>>>>> Stashed changes
   {{- end }}
 {{- end }}
         env:
